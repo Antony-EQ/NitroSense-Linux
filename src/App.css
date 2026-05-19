@@ -1,0 +1,769 @@
+/* ================================================
+   NitroSense Linux — UI inspired by NitroSense Windows
+   ================================================ */
+
+/* ─── Fan animation ───────────────────────────── */
+@keyframes fan-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+.fan-spinning {
+  filter: drop-shadow(0 0 5px rgba(255, 32, 32, 0.35));
+  transition: filter 0.5s ease;
+}
+
+/* ─── Toast animations ────────────────────────── */
+@keyframes toast-in {
+  from { transform: translateX(calc(100% + 24px)); opacity: 0; }
+  to   { transform: translateX(0); opacity: 1; }
+}
+@keyframes toast-out {
+  from { transform: translateX(0); opacity: 1; }
+  to   { transform: translateX(calc(100% + 24px)); opacity: 0; }
+}
+
+/* ─── Keyboard effect (breathing) ────────────── */
+@keyframes kb-breathe {
+  0%, 100% { opacity: 0.6; }
+  50%       { opacity: 1; }
+}
+
+.app-root {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  background: var(--bg-root);
+  overflow: hidden;
+}
+
+/* ─── Toast container ─────────────────────────── */
+.toast-container {
+  position: fixed;
+  top: 68px;
+  right: 16px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #161616;
+  border: 1px solid #2a2a2a;
+  border-left: 3px solid var(--accent-red);
+  color: var(--text-main);
+  padding: 10px 16px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255,32,32,0.08);
+  animation: toast-in 0.28s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  letter-spacing: 0.3px;
+}
+
+.toast.removing {
+  animation: toast-out 0.28s ease-in forwards;
+}
+
+.toast-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent-red);
+  box-shadow: 0 0 6px var(--accent-red);
+  flex-shrink: 0;
+}
+
+/* ─── Header ─────────────────────────────────── */
+.ns-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  height: 50px;
+  background: #0d0d0d;
+  background-image:
+    repeating-linear-gradient(
+      45deg,
+      rgba(255,255,255,0.012) 0px, rgba(255,255,255,0.012) 1px,
+      transparent 1px, transparent 6px
+    ),
+    repeating-linear-gradient(
+      -45deg,
+      rgba(255,255,255,0.012) 0px, rgba(255,255,255,0.012) 1px,
+      transparent 1px, transparent 6px
+    );
+  background-size: 6px 6px;
+  border-bottom: 1px solid var(--border-color);
+  flex-shrink: 0;
+}
+
+.ns-acer-badge {
+  width: 32px;
+  height: 32px;
+  background: var(--accent-red);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 12px var(--accent-red-glow);
+  flex-shrink: 0;
+}
+
+.ns-title {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 8px;
+  color: #e0e0e0;
+  text-transform: uppercase;
+}
+
+.ns-model {
+  font-size: 11px;
+  color: var(--accent-red);
+  padding: 4px 12px;
+  border: 1px solid rgba(255, 32, 32, 0.3);
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+}
+
+/* ─── Tabs ───────────────────────────────────── */
+.ns-tabs {
+  display: flex;
+  background: #0d0d0d;
+  border-bottom: 1px solid var(--border-color);
+  padding: 0 24px;
+  flex-shrink: 0;
+  gap: 4px;
+}
+
+.ns-tab {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-muted);
+  padding: 9px 18px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+  letter-spacing: 0.4px;
+}
+
+.ns-tab:hover { color: #bbb; }
+
+.ns-tab.active {
+  color: var(--text-main);
+  border-bottom-color: var(--accent-red);
+}
+
+/* ─── Dashboard Layout ───────────────────────── */
+.ns-dashboard {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* ─── Left Panel ─────────────────────────────── */
+.ns-left {
+  width: 210px;
+  flex-shrink: 0;
+  background: #0e0e0e;
+  background-image:
+    repeating-linear-gradient(
+      45deg,
+      rgba(255,255,255,0.01) 0px, rgba(255,255,255,0.01) 1px,
+      transparent 1px, transparent 6px
+    ),
+    repeating-linear-gradient(
+      -45deg,
+      rgba(255,255,255,0.01) 0px, rgba(255,255,255,0.01) 1px,
+      transparent 1px, transparent 6px
+    );
+  background-size: 6px 6px;
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.ns-section {
+  padding: 18px 14px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.ns-section-title {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #555;
+  margin-bottom: 14px;
+}
+
+/* Fan Options */
+.ns-fan-options {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ns-fan-opt {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  color: #4a4a55;
+}
+
+.ns-fan-opt:hover { background: #161616; color: #777; }
+.ns-fan-opt.active { color: var(--accent-red); }
+
+.ns-radio {
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  border: 2px solid #303030;
+  position: relative;
+  flex-shrink: 0;
+  transition: border-color 0.2s;
+}
+
+.ns-radio.active { border-color: var(--accent-red); }
+
+.ns-radio.active::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 5px;
+  height: 5px;
+  background: var(--accent-red);
+  border-radius: 50%;
+  box-shadow: 0 0 5px var(--accent-red);
+}
+
+.ns-fan-label {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.ns-custom-speed {
+  margin-top: 10px;
+  padding: 0 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ns-slider {
+  flex: 1;
+  accent-color: var(--accent-red);
+  cursor: pointer;
+  height: 4px;
+}
+
+.ns-speed-val {
+  font-size: 12px;
+  color: var(--accent-red);
+  font-weight: 700;
+  width: 32px;
+  text-align: right;
+}
+
+/* Power Options */
+.ns-power-opts {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ns-power-opt {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  color: #4a4a55;
+  transition: all 0.2s;
+}
+
+.ns-power-opt:hover { background: #161616; color: #777; }
+.ns-power-opt.active { color: var(--accent-red); }
+
+.ns-power-icon {
+  width: 20px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+.ns-power-label {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* ─── Right Content ──────────────────────────── */
+.ns-right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #0a0a0a;
+  min-width: 0;
+}
+
+/* CoolBoost */
+.ns-coolboost-row {
+  display: flex;
+  justify-content: flex-end;
+  padding: 12px 20px 0;
+  flex-shrink: 0;
+}
+
+.ns-coolboost-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #555;
+  cursor: pointer;
+  padding: 5px 14px;
+  border: 1px solid #1e1e1e;
+  border-radius: 20px;
+  background: #0f0f0f;
+  transition: all 0.2s;
+  letter-spacing: 0.5px;
+}
+
+.ns-coolboost-badge:hover { border-color: #2a2a2a; color: #777; }
+
+.ns-coolboost-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #252525;
+  border: 1px solid #333;
+  transition: all 0.3s;
+}
+
+.ns-coolboost-dot.active {
+  background: var(--accent-red);
+  box-shadow: 0 0 7px var(--accent-red-glow);
+  border-color: var(--accent-red);
+}
+
+/* ─── Fan Gauges ─────────────────────────────── */
+.ns-gauges {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 10px 20px 4px;
+  flex-shrink: 0;
+}
+
+.ns-gauge-label {
+  font-size: 15px;
+  font-weight: 700;
+  text-align: center;
+  line-height: 1.8;
+  min-width: 64px;
+}
+
+.ns-temp-sub {
+  font-size: 13px;
+  color: var(--accent-red);
+  font-weight: 600;
+  display: block;
+}
+
+.fan-svg { display: block; }
+
+/* ─── Monitoring ─────────────────────────────── */
+.ns-monitoring {
+  flex: 1;
+  padding: 6px 20px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  overflow: hidden;
+  border-top: 1px solid var(--border-subtle);
+  min-height: 0;
+}
+
+.ns-monitor-header {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.ns-monitor-subtitle {
+  font-size: 10px;
+  color: #383838;
+  letter-spacing: 0.3px;
+}
+
+.monitor-row {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-height: 0;
+}
+
+.monitor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.monitor-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.monitor-range {
+  font-size: 10px;
+  color: #383838;
+}
+
+.monitor-body {
+  flex: 1;
+  position: relative;
+  background: #0c0c0c;
+  border: 1px solid #181818;
+  border-radius: 3px;
+  overflow: hidden;
+  display: flex;
+  align-items: stretch;
+  min-height: 55px;
+}
+
+.monitor-svg {
+  flex: 1;
+  height: 100%;
+  display: block;
+  min-width: 0;
+}
+
+.monitor-vals {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 6px 12px;
+  flex-shrink: 0;
+  min-width: 56px;
+  border-left: 1px solid #181818;
+}
+
+.monitor-temp {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--accent-red);
+  line-height: 1;
+}
+
+.monitor-load {
+  font-size: 11px;
+  color: #555;
+  margin-top: 3px;
+}
+
+/* ─── RGB Lighting Tab ───────────────────────── */
+.ns-tab-content {
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
+}
+
+.ns-rgb-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 760px;
+}
+
+.ns-rgb-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.ns-panel {
+  background: #0e0e0e;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 20px;
+}
+
+.ns-panel-title {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #555;
+  margin-bottom: 16px;
+}
+
+.ns-color-presets {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.ns-color-swatch {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: transform 0.15s, border-color 0.15s;
+  flex-shrink: 0;
+}
+
+.ns-color-swatch:hover { transform: scale(1.1); }
+
+.ns-color-swatch.active {
+  border-color: rgba(255, 255, 255, 0.7);
+  transform: scale(1.15);
+}
+
+.ns-color-picker {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid #2a2a2a;
+  background: #1a1a1a;
+  cursor: pointer;
+  padding: 2px;
+  overflow: hidden;
+}
+
+.ns-effects {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ns-effect-btn {
+  background: #141414;
+  border: 1px solid #252525;
+  color: #555;
+  padding: 10px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  transition: all 0.2s;
+  text-align: left;
+  letter-spacing: 0.3px;
+}
+
+.ns-effect-btn:hover { border-color: #333; color: #999; }
+
+.ns-effect-btn.active {
+  background: rgba(255, 32, 32, 0.12);
+  border-color: var(--accent-red);
+  color: var(--accent-red);
+  box-shadow: inset 0 0 12px rgba(255, 32, 32, 0.08);
+}
+
+/* ─── Keyboard Preview ───────────────────────── */
+.ns-kb-panel {
+  width: 100%;
+}
+
+.ns-panel-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ns-effect-badge {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--accent-red);
+  border: 1px solid rgba(255,32,32,0.4);
+  border-radius: 3px;
+  padding: 2px 7px;
+}
+
+/* Contenedor — fondo negro como el chasis del teclado */
+.kb-container {
+  width: 100%;
+  padding: 12px 10px;
+  background: #050505;
+  border-radius: 8px;
+  border: 1px solid #1a1a1a;
+  overflow: hidden;
+  box-shadow: inset 0 0 30px rgba(0,0,0,0.6);
+}
+
+.kb-container.kb-effect .kb-key {
+  animation: kb-breathe 2s ease-in-out infinite;
+}
+
+.kb-inner {
+  display: flex;
+  align-items: flex-start;
+}
+
+.kb-section {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.kb-row {
+  display: flex;
+  gap: 3px;
+  min-height: 26px;
+}
+
+/* Tecla — negro oscuro con luz RGB en borde y texto */
+.kb-key {
+  height: 26px;
+  border: 1px solid #1e1e1e;   /* se sobreescribe con color dinámico */
+  border-radius: 4px;
+  background: #0a0a0a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: border-color 0.3s, box-shadow 0.3s, color 0.3s;
+  position: relative;
+}
+
+/* Borde inferior para simular profundidad física del keycap */
+.kb-key::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 2px;
+  right: 2px;
+  height: 2px;
+  background: rgba(0,0,0,0.7);
+  border-radius: 0 0 3px 3px;
+}
+
+.kb-phantom {
+  height: 26px;
+  flex-shrink: 0;
+}
+
+.kb-key-label {
+  font-size: 7px;
+  font-weight: 700;
+  color: inherit;   /* hereda el color RGB de la tecla */
+  pointer-events: none;
+  white-space: nowrap;
+  line-height: 1;
+  text-shadow: 0 0 4px currentColor;  /* texto también brilla */
+}
+
+/* ─── Settings Tab ───────────────────────────── */
+.ns-settings-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 600px;
+}
+
+.ns-setting-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  background: #0e0e0e;
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  gap: 20px;
+}
+
+.ns-setting-row:hover { border-color: #282828; }
+
+.ns-setting-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.ns-setting-desc {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.ns-switch {
+  position: relative;
+  display: inline-block;
+  width: 46px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.ns-switch input { opacity: 0; width: 0; height: 0; }
+
+.ns-switch-track {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background: #252525;
+  border-radius: 24px;
+  border: 1px solid #333;
+  transition: 0.3s;
+}
+
+.ns-switch-track::before {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  left: 3px;
+  top: 3px;
+  background: #555;
+  border-radius: 50%;
+  transition: 0.3s;
+}
+
+.ns-switch input:checked + .ns-switch-track {
+  background: var(--accent-red);
+  border-color: var(--accent-red);
+}
+
+.ns-switch input:checked + .ns-switch-track::before {
+  transform: translateX(22px);
+  background: white;
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.5);
+}
+
+.ns-version {
+  margin-top: 28px;
+  font-size: 11px;
+  color: #333;
+  letter-spacing: 0.3px;
+}
